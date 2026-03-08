@@ -93,7 +93,15 @@ function getActiveTime(shiftDuration, idleTime) {
 // Returns: boolean
 // ============================================================
 function metQuota(date, activeTime) {
-    // TODO: Implement this function
+    const [year, month, day] = date.split("-").map(Number);
+    const activeTimeinSec= durationToSeconds(activeTime);
+    if(year === 2025 && month === 4 && day >= 10 && day <= 30){ //check the EId al fitr period
+       return (activeTimeinSec>=6*3600);
+    }else {
+        return (activeTimeinSec>= (8*3600)+(24*60));
+
+    }
+
 }
 
 // ============================================================
