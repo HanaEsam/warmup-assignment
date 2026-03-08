@@ -34,7 +34,33 @@ function durationToSeconds(durationStr) {
     const [h, m, s] = durationStr.trim().split(":").map(Number);
     return h * 3600 + m * 60 + s;
 }
-
+// helper to parse the shiftt info
+function parseShifts(textFile){
+    const content= fs.readFileSync(textFile,"utf8");
+    const lines = content.split("\n").filter(l=> l.trim()!=="");//remove any empty lines
+    
+    return lines.map((line) => {
+        const parts = line.split(",").map(p => p.trim()); // extra spaces are removed
+        return {
+            driverID: parts[0],
+            driverName: parts[1],
+            date: parts[2],
+            startTime: parts[3],
+            endTime: parts[4],
+            shiftDuration: parts[5],
+            idleTime: parts[6],
+            activeTime: parts[7],
+            metQuota: parts[8] === "true",
+            hasBonus: parts[9] === "true"
+        };
+    });
+}
+//helper add new shift into the file 
+function shiftsToText(shifts){
+    return shifts.map((r) => {
+        return `${r.driverID},${r.driverName},${r.date},${r.startTime},${r.endTime},${r.shiftDuration},${r.idleTime},${r.activeTime},${r.metQuota},${r.hasBonus}`;
+    }).join("\n");
+}
 function getShiftDuration(startTime, endTime) {
   
    const startt= timeToSeconds(startTime);
@@ -109,9 +135,44 @@ function metQuota(date, activeTime) {
 // textFile: (typeof string) path to shifts text file
 // shiftObj: (typeof object) has driverID, driverName, date, startTime, endTime
 // Returns: object with 10 properties or empty object {}
-// ============================================================
+// ===========================================g=================
 function addShiftRecord(textFile, shiftObj) {
-    // TODO: Implement this function
+    const { driverID, driverName, date, startTime, endTime } = shiftObj;
+    //reads the exisiting records 
+    const shift = parseShifts(textFile);
+
+    const duplicate = shift.find(r => r.driverID === driverID && r.date === date);
+    if (duplicate)
+        return {};
+    const shiftDuration= getShiftDuration(shiftObj.startTime, shiftObj.endTime);
+    const idleTime= getIdleTime(shiftObj.startTime, shiftObj.endTime);
+    const activeTime= getActiveTime(shiftDuration, idleTime);
+    const quota= metQuota(date,activeTime);
+
+    const newRecord = {
+    driverID: driverID,
+    driverName: driverName,
+    date: date,
+    startTime: startTime,
+    endTime: endTime,
+    shiftDuration: shiftDuration,
+    idleTime: idleTime,
+    activeTime: activeTime,
+    metQuota: quota,
+    hasBonus: false
+};
+//to find driverID 
+const lastIndex = shifts.reduce((acc, r, i) => {
+    return r.driverID === driverID ? i : acc;
+}, -1);
+if (lastIndex === -1) {
+    
+    shifts.push(newRecord);
+} else {
+    
+    shifts.splice(lastIndex + 1, 0, newRecord);
+}
+    
 }
 
 // ============================================================
