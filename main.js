@@ -7,7 +7,7 @@ const fs = require("fs");
 // Returns: string formatted as h:mm:ss
 // ============================================================
 
-// helper function to convert to time to seconds 
+// helper function to convert to time to seconds when am/pm
 function timeToSeconds(timeStr) {
     timeStr = timeStr.trim().toLowerCase();
     const period = timeStr.includes("pm") ? "pm" : "am";
@@ -29,9 +29,14 @@ function timeToNormal(totoalSec){
     
     return `${hours}:${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 }
+// helper to coverts duration overall into seconds (no am/pm)
+function durationToSeconds(durationStr) {
+    const [h, m, s] = durationStr.trim().split(":").map(Number);
+    return h * 3600 + m * 60 + s;
+}
 
 function getShiftDuration(startTime, endTime) {
-    // TODO: Implement this function
+  
    const startt= timeToSeconds(startTime);
    const endt= timeToSeconds(endTime);
    let difference = endt-startt;
@@ -54,12 +59,12 @@ function getIdleTime(startTime, endTime) {
 
     const start= timeToSeconds(startTime);
     const end= timeToSeconds(endTime);
-    const deliveryStart = 8 * 3600;   // 8am in seconds
-    const deliveryEnd = 22 * 3600;    // 10pm in seconds
+    const deliveryStart = 8 * 3600;   // 8am covert to seconds
+    const deliveryEnd = 22 * 3600;    // 10pm convert to seconds
     if(start<deliveryStart){
         idle+= deliveryStart-start;
     }
-    if(endT>deliveryEnd){
+    if(end>deliveryEnd){
         idle+=end - deliveryEnd;
     }
     return timeToNormal(idle);
@@ -73,7 +78,12 @@ function getIdleTime(startTime, endTime) {
 // Returns: string formatted as h:mm:ss
 // ============================================================
 function getActiveTime(shiftDuration, idleTime) {
-    // TODO: Implement this function
+    const ShiftinSec = durationToSeconds(shiftDuration);
+    const IdelinSec= durationToSeconds(idleTime)
+    const activeTime = ShiftinSec-IdelinSec;
+
+    return timeToNormal(activeTime);
+    
 }
 
 // ============================================================
