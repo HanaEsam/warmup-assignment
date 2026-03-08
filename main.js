@@ -104,9 +104,9 @@ function getIdleTime(startTime, endTime) {
 // Returns: string formatted as h:mm:ss
 // ============================================================
 function getActiveTime(shiftDuration, idleTime) {
-    const ShiftinSec = durationToSeconds(shiftDuration);
-    const IdelinSec= durationToSeconds(idleTime)
-    const activeTime = ShiftinSec-IdelinSec;
+    const shiftinSec = durationToSeconds(shiftDuration);
+    const idleinSec= durationToSeconds(idleTime);
+    const activeTime = shiftinSec-idleinSec;
 
     return timeToNormal(activeTime);
     
@@ -185,8 +185,18 @@ fs.writeFileSync(textFile, shiftsToText(shifts), "utf8");
 // Returns: nothing (void)
 // ============================================================
 function setBonus(textFile, driverID, date, newValue) {
-    // TODO: Implement this function
+    
+    const shifts = parseShifts(textFile);
+    
+    const idx = shifts.findIndex(r => r.driverID === driverID && r.date === date);//returns index
+    
+    if (idx === -1) return; // if record not found do nothing
+    
+    shifts[idx].hasBonus = newValue; // updates the record
+    
+    fs.writeFileSync(textFile, shiftsToText(shifts), "utf8");
 }
+
 
 // ============================================================
 // Function 7: countBonusPerMonth(textFile, driverID, month)
@@ -196,7 +206,21 @@ function setBonus(textFile, driverID, date, newValue) {
 // Returns: number (-1 if driverID not found)
 // ============================================================
 function countBonusPerMonth(textFile, driverID, month) {
-    // TODO: Implement this function
+   const shifts = parseShifts(textFile);
+    
+    // get all records of this driver
+    const driverRecords = shifts.filter(r => r.driverID === driverID);
+    
+
+    // if no records found → return -1
+    if (driverRecords.length === 0) return -1;
+    
+    // count records where month matches AND hasBonus is true
+    const targetMonth = parseInt(month, 10);
+    return driverRecords.filter(r => {
+        const recordMonth =  parseInt(r.date.split("-")[1], 10);
+        return recordMonth === targetMonth &&  r.hasBonus==true ;// check hasBonus
+    }).length;
 }
 
 // ============================================================
