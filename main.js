@@ -139,9 +139,9 @@ function metQuota(date, activeTime) {
 function addShiftRecord(textFile, shiftObj) {
     const { driverID, driverName, date, startTime, endTime } = shiftObj;
     //reads the exisiting records 
-    const shift = parseShifts(textFile);
+    const shifts = parseShifts(textFile);
 
-    const duplicate = shift.find(r => r.driverID === driverID && r.date === date);
+    const duplicate = shifts.find(r => r.driverID === driverID && r.date === date);
     if (duplicate)
         return {};
     const shiftDuration= getShiftDuration(shiftObj.startTime, shiftObj.endTime);
@@ -172,7 +172,8 @@ if (lastIndex === -1) {
     
     shifts.splice(lastIndex + 1, 0, newRecord);
 }
-    
+fs.writeFileSync(textFile, shiftsToText(shifts), "utf8");
+    return newRecord;
 }
 
 // ============================================================
