@@ -50,7 +50,20 @@ function getShiftDuration(startTime, endTime) {
 // Returns: string formatted as h:mm:ss
 // ============================================================
 function getIdleTime(startTime, endTime) {
-    // TODO: Implement this function
+    let idle=0;
+
+    const start= timeToSeconds(startTime);
+    const end= timeToSeconds(endTime);
+    const deliveryStart = 8 * 3600;   // 8am in seconds
+    const deliveryEnd = 22 * 3600;    // 10pm in seconds
+    if(start<deliveryStart){
+        idle+= deliveryStart-start;
+    }
+    if(endT>deliveryEnd){
+        idle+=end - deliveryEnd;
+    }
+    return timeToNormal(idle);
+
 }
 
 // ============================================================
