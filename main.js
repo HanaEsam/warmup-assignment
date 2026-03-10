@@ -185,6 +185,7 @@ fs.writeFileSync(textFile, shiftsToText(shifts), "utf8");
 // Returns: nothing (void)
 // ============================================================
 function setBonus(textFile, driverID, date, newValue) {
+
     
     const shifts = parseShifts(textFile);
     
@@ -231,7 +232,18 @@ function countBonusPerMonth(textFile, driverID, month) {
 // Returns: string formatted as hhh:mm:ss
 // ============================================================
 function getTotalActiveHoursPerMonth(textFile, driverID, month) {
-    // TODO: Implement this function
+        const shifts= parseShifts(textFile);
+        const targetMon= parseInt(month,10);//10 is base 10 converts it 
+        const filtered= shifts.filter(r=>{
+        const recMon=  parseInt(r.date.split("-")[1], 10);;
+        return r.driverID === driverID && recdMon === targetMon;
+    })
+    const totalSec = filtered.reduce((sum, r) => {
+        return sum + durationToSeconds(r.activeTime); // convert each activeTime to seconds
+    }, 0);
+    
+    
+    return timeToNormal(totalSec);
 }
 
 // ============================================================
@@ -245,6 +257,7 @@ function getTotalActiveHoursPerMonth(textFile, driverID, month) {
 // ============================================================
 function getRequiredHoursPerMonth(textFile, rateFile, bonusCount, driverID, month) {
     // TODO: Implement this function
+
 }
 
 // ============================================================
