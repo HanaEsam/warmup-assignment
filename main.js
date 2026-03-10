@@ -236,7 +236,7 @@ function getTotalActiveHoursPerMonth(textFile, driverID, month) {
         const targetMon= parseInt(month,10);//10 is base 10 converts it 
         const filtered= shifts.filter(r=>{
         const recMon=  parseInt(r.date.split("-")[1], 10);;
-        return r.driverID === driverID && recdMon === targetMon;
+        return r.driverID === driverID && recMon === targetMon;
     })
     const totalSec = filtered.reduce((sum, r) => {
         return sum + durationToSeconds(r.activeTime); // convert each activeTime to seconds
