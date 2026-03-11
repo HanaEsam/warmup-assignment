@@ -38,9 +38,14 @@ function durationToSeconds(durationStr) {
 function parseShifts(textFile){
     const content= fs.readFileSync(textFile,"utf8");
     const lines = content.split("\n").filter(l=> l.trim()!=="");//remove any empty lines
+
+    // skip header row if it exists
+    const dataLines = lines[0].toLowerCase().includes("driverid") 
+        ? lines.slice(1) 
+        : lines;
     
-    return lines.map((line) => {
-        const parts = line.split(",").map(p => p.trim()); // extra spaces are removed
+    return dataLines.map((line) => {
+        const parts = line.split(",").map(p => p.trim());
         return {
             driverID: parts[0],
             driverName: parts[1],
@@ -127,7 +132,7 @@ function getIdleTime(startTime, endTime) {
 function getActiveTime(shiftDuration, idleTime) {
     const shiftinSec = durationToSeconds(shiftDuration);
     const idleinSec= durationToSeconds(idleTime);
-    const activeTime = shiftinSec-idleinSec;
+    const activeTime = Math.max(0,shiftinSec-idleinSec);
 
     return timeToNormal(activeTime);
     
@@ -165,8 +170,8 @@ function addShiftRecord(textFile, shiftObj) {
     const duplicate = shifts.find(r => r.driverID === driverID && r.date === date);
     if (duplicate)
         return {};
-    const shiftDuration= getShiftDuration(shiftObj.startTime, shiftObj.endTime);
-    const idleTime= getIdleTime(shiftObj.startTime, shiftObj.endTime);
+    const shiftDuration= getShiftDuration(startTime, endTime);
+    const idleTime= getIdleTime(startTime, endTime);
     const activeTime= getActiveTime(shiftDuration, idleTime);
     const quota= metQuota(date,activeTime);
 
